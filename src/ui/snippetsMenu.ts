@@ -51,18 +51,36 @@ export default function snippetsMenu(
           .setValue(customCss.enabledSnippets.has(snippet))
           .onChange(changeSnippetStatus);
 
+        // Ensure toggle component click events work properly
+        const toggleEl = toggleComponent.toggleEl;
+        if (toggleEl) {
+          toggleEl.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent menu item click
+          });
+        }
+
         buttonComponent
           .setIcon("ms-snippet")
           .setClass("MS-OpenSnippet")
           .setTooltip(`Open snippet`)
-
-          .onClick((e: any) => {
+          .onClick((e: MouseEvent | KeyboardEvent) => {
+            e.stopPropagation(); // Prevent menu from closing when clicking button
             app.openWithDefaultApp(snippetPath);
           });
 
-        snippetElement.onClick((e: any) => {
+        // Handle clicks on menu item (excluding buttons and toggle)
+        snippetElement.onClick((e: MouseEvent | KeyboardEvent) => {
+          const target = e.target as HTMLElement;
+          
+          // Skip if clicking on button or toggle components
+          if (target.closest('.MS-OpenSnippet') || target.closest('.checkbox-container')) {
+            return;
+          }
+          
+          // Toggle snippet for clicks on title/empty areas
           e.preventDefault();
-          e.stopImmediatePropagation();
+          e.stopPropagation();
+          changeSnippetStatus();
         });
       });
     });
@@ -87,7 +105,8 @@ export default function snippetsMenu(
         .setClass("MySnippetsButton")
         .setClass("MS-Reload")
         .setTooltip("Reload snippets")
-        .onClick((e: any) => {
+        .onClick((e: MouseEvent | KeyboardEvent) => {
+          e.stopPropagation();
           customCss.requestLoadSnippets();
           new Notice("Snippets reloaded");
         });
@@ -96,7 +115,8 @@ export default function snippetsMenu(
         .setClass("MySnippetsButton")
         .setClass("MS-Folder")
         .setTooltip("Open snippets folder")
-        .onClick((e: any) => {
+        .onClick((e: MouseEvent | KeyboardEvent) => {
+          e.stopPropagation();
           app.openWithDefaultApp(snippetsFolder);
         });
       addButton
@@ -104,7 +124,8 @@ export default function snippetsMenu(
         .setClass("MySnippetsButton")
         .setClass("MS-Folder")
         .setTooltip("Create new snippet")
-        .onClick((e: any) => {
+        .onClick((e: MouseEvent | KeyboardEvent) => {
+          e.stopPropagation();
           new CreateSnippetModal(app, plugin).open();
         });
     });
