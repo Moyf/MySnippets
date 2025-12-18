@@ -63,7 +63,7 @@ export default class CreateSnippetModal extends Modal {
       let snippetPath = customCss.getSnippetPath(fileName);
       if (fileName) {
         if (!customCss.snippets.includes(fileName)) {
-          await app.vault.create(
+          await this.app.vault.create(
             `${customCss.getSnippetsFolder()}/${fileName}.css`,
             fileContents
           );
@@ -81,7 +81,7 @@ export default class CreateSnippetModal extends Modal {
     };
     const saveButton = new ButtonComponent(contentEl)
       .setButtonText("Create Snippet")
-      .onClick(doAdd);
+      .onClick((e: MouseEvent | KeyboardEvent) => doAdd());
     saveButton.buttonEl.addClass("wg-button");
     fileTitleValue.inputEl.focus();
   }
